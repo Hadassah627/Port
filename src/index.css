@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  font-family: Inter, Poppins, system-ui, sans-serif;
+  scroll-behavior: smooth;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #ffffff;
+}
+
+html.dark body {
+  background: #09111d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(231, 177, 27, 0.25);
+}
+
+.font-heading {
+  font-family: Poppins, Inter, system-ui, sans-serif;
+}
+
+.glass-panel {
+  @apply border border-white/10 bg-white/75 backdrop-blur-xl dark:bg-ink-900/70;
+}
+
+.section-grid {
+  background-image: radial-gradient(rgba(73, 110, 166, 0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.shadow-soft {
+  box-shadow: 0 25px 80px rgba(9, 17, 29, 0.12);
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
