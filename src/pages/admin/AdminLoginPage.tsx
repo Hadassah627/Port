@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { FiLock, FiMail } from 'react-icons/fi';
@@ -30,9 +30,11 @@ export const AdminLoginPage = () => {
     }
   };
 
-  if (!loading && firebaseUser && isAdmin) {
-    navigate('/admin', { replace: true });
-  }
+  useEffect(() => {
+    if (!loading && firebaseUser && isAdmin) {
+      navigate('/admin', { replace: true });
+    }
+  }, [firebaseUser, isAdmin, loading, navigate]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-ink-950 via-ink-900 to-slate-950 px-4 py-10 text-white">

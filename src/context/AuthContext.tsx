@@ -19,18 +19,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => watchAuth(async (user) => {
-    setFirebaseUser(user);
-    if (!user) {
-      setUserProfile(null);
-      setLoading(false);
-      return;
-    }
+  useEffect(
+    () =>
+      watchAuth((user) => {
+        setFirebaseUser(user);
 
-    const profile = await loadUserProfile(user.uid);
-    setUserProfile(profile);
-    setLoading(false);
-  }), []);
+        if (!user) {
+          setUserProfile(null);
+          setLoading(false);
+          return;
+        }
+
+        setLoading(false);
+
+        void loadUserProfile(user.uid)
+          .then((profile) => setUserProfile(profile))
+          .catch(() => setUserProfile(null));
+      }),
+    []
+  );
 
   const value = useMemo<AuthContextValue>(() => ({
     firebaseUser,

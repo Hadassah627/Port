@@ -37,6 +37,19 @@ React + Firebase faculty portfolio for Dr. Abduru Sankara Rao, Ph.D.
 - Create a matching `users/{uid}` document with `role: 'admin'`.
 - The dashboard only opens when that Firestore user record is present.
 
+## Seed an admin user
+
+Use the helper script to create or update the admin profile record in Firestore:
+
+```bash
+npm install
+set FIREBASE_PROJECT_ID=your-project-id
+set GOOGLE_APPLICATION_CREDENTIALS=path\\to\\service-account.json
+npm run seed:admin -- --uid=your-auth-uid --email=you@example.com --displayName="Admin"
+```
+
+You can also pass `ADMIN_UID`, `ADMIN_EMAIL`, and `ADMIN_DISPLAY_NAME` as environment variables.
+
 ## Deployment
 
 - Build: `npm run build`
