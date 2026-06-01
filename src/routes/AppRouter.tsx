@@ -27,10 +27,10 @@ export const AppRouter = () => (
         <Route path="contact" element={<ContactPage />} />
       </Route>
 
-      <Route path="admin/login" element={<AdminLoginPage />} />
+      <Route path="admin" element={<AdminLoginPage />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<AdminLayout />}>
-          <Route path="admin" element={<AdminDashboardPage />} />
+          <Route path="admin/dashboard" element={<AdminDashboardPage />} />
         </Route>
       </Route>
 

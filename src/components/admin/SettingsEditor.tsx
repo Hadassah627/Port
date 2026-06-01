@@ -27,11 +27,23 @@ export const SettingsEditor = () => {
   const { register, control, handleSubmit, reset, formState: { isSubmitting } } = useForm<SettingsForm>({ defaultValues: defaultSettings });
   const socialLinks = useFieldArray({ control, name: 'socialLinks' });
 
+  const sampleSettings: Settings = {
+    siteTitle: 'Faculty Portfolio',
+    seoTitle: 'Dr. Abduru Sankara Rao',
+    seoDescription: 'Sample SEO description for development.',
+    ogImageUrl: '/sir.png',
+    contactEmail: 'abduru@rgukt.edu.in',
+    contactPhone: '+91-98765-43210',
+    socialLinks: [{ label: 'LinkedIn', url: 'https://www.linkedin.com/' }],
+  };
+
+  const effectiveData = data ?? (import.meta.env.DEV ? sampleSettings : null);
+
   useEffect(() => {
-    if (data) {
-      reset({ ...defaultSettings, ...data, socialLinks: data.socialLinks ?? defaultSettings.socialLinks });
+    if (effectiveData) {
+      reset({ ...defaultSettings, ...effectiveData, socialLinks: effectiveData.socialLinks ?? defaultSettings.socialLinks });
     }
-  }, [data, reset]);
+  }, [effectiveData, reset]);
 
   const submitSettings = async (values: SettingsForm) => {
     try {
@@ -56,7 +68,7 @@ export const SettingsEditor = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading && !import.meta.env.DEV) {
     return <LoadingState message="Loading settings..." />;
   }
 
@@ -113,7 +125,7 @@ export const SettingsEditor = () => {
               </div>
             ))}
           </div>
-          {data?.ogImageUrl ? <img src={data.ogImageUrl} alt="Open graph" className="mt-4 h-52 w-full rounded-3xl object-cover" /> : null}
+          {effectiveData?.ogImageUrl ? <img src={effectiveData.ogImageUrl} alt="Open graph" className="mt-4 h-52 w-full rounded-3xl object-cover" /> : null}
         </div>
 
         <button type="submit" disabled={isSubmitting} className="inline-flex items-center justify-center rounded-2xl bg-ink-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink-800 disabled:opacity-70">

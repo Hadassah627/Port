@@ -47,7 +47,16 @@ export const CollectionManager = <T extends Record<string, any>>({ config, secti
   const queryClient = useQueryClient();
   const { data, isLoading } = useCollectionQuery<(T & { id: string })>([config.collectionPath], config.collectionPath);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const editingItem = useMemo(() => data?.find((item) => item.id === editingId) ?? null, [data, editingId]);
+  const sampleItemsByCollection: Record<string, Array<Record<string, unknown>>> = {
+    research: [{ id: 'sample-research', title: 'Sample Research Project', category: 'AI', description: 'Sample research description.', objectives: 'Sample objectives.', methodology: 'Sample methodology.', results: 'Sample results.', status: 'Active', imageUrls: [], fileUrls: [] }],
+    publications: [{ id: 'sample-publication', title: 'Sample Publication', authors: 'Dr. A, Dr. B', venue: 'Sample Journal', year: new Date().getFullYear(), type: 'Journal', doi: '', pdfUrl: '', abstract: 'Sample abstract.', keywords: [], citation: 'Sample citation', bibtex: '@article{sample}', featured: false }],
+    teaching: [{ id: 'sample-teaching', courseName: 'Sample Course', courseCode: 'CSE000', semester: 'Spring', year: new Date().getFullYear(), description: 'Sample teaching description.', credits: '', level: '' }],
+    gallery: [{ id: 'sample-gallery', title: 'Sample Gallery Item', category: 'Events', imageUrl: '', description: 'Sample gallery description.', year: new Date().getFullYear(), featured: false }],
+    achievements: [{ id: 'sample-achievement', title: 'Sample Achievement', value: '1+', description: 'Sample achievement description.', icon: 'star' }],
+  };
+
+  const effectiveData = data ?? (import.meta.env.DEV ? (sampleItemsByCollection[config.collectionPath] as Array<T & { id: string }>) : []);
+  const editingItem = useMemo(() => effectiveData?.find((item) => item.id === editingId) ?? null, [effectiveData, editingId]);
   const { register, reset, handleSubmit, formState: { isSubmitting } } = useForm<Record<string, unknown>>({
     defaultValues: normalizeFormValues(config, null),
   });
@@ -58,7 +67,7 @@ export const CollectionManager = <T extends Record<string, any>>({ config, secti
   }, [config, editingItem, reset]);
 
   const filteredItems = useMemo(() => {
-    const list = (data ?? []).slice().sort((left, right) => {
+    const list = (effectiveData ?? []).slice().sort((left, right) => {
       if (!config.sortBy) {
         return 0;
       }
@@ -81,7 +90,7 @@ export const CollectionManager = <T extends Record<string, any>>({ config, secti
     return list.filter((item) =>
       config.searchableFields.some((field) => String(item[field] ?? '').toLowerCase().includes(queryText))
     );
-  }, [config, data, searchTerm]);
+  }, [config, effectiveData, searchTerm]);
 
   const submitForm = async (values: Record<string, unknown>) => {
     const payload: Record<string, unknown> = { ...values };
@@ -150,7 +159,7 @@ export const CollectionManager = <T extends Record<string, any>>({ config, secti
     toast.success(`${config.title} deleted`);
   };
 
-  if (isLoading) {
+  if (isLoading && !import.meta.env.DEV) {
     return <LoadingState message={`Loading ${config.title.toLowerCase()}...`} />;
   }
 

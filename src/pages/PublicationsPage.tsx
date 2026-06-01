@@ -13,15 +13,35 @@ import { truncate } from '../utils/format';
 
 export const PublicationsPage = () => {
   const { data, isLoading } = useCollectionQuery<(PublicationItem & { id: string })>(['publications'], 'publications');
+
+  const samplePubs: (PublicationItem & { id: string })[] = [
+    {
+      id: 'p1',
+      title: 'Robust Hyperspectral Classification',
+      slug: 'robust-hyperspectral-classification',
+      authors: 'A. Researcher, B. Collaborator',
+      venue: 'Journal of Remote Sensing',
+      year: 2023,
+      type: 'Journal',
+      doi: '10.1234/example',
+      pdfUrl: '',
+      abstract: 'A study on robust classification methods for hyperspectral imagery.',
+      keywords: ['hyperspectral', 'classification'],
+      citation: 'A. Researcher et al., 2023',
+      bibtex: '@article{example, title={Example}}',
+    },
+  ];
+
+  const effectiveData = data ?? (import.meta.env.DEV ? samplePubs : []);
   const [searchTerm, setSearchTerm] = useState('');
   const [yearFilter, setYearFilter] = useState('All');
   const [typeFilter, setTypeFilter] = useState('All');
   const [selectedItem, setSelectedItem] = useState<(PublicationItem & { id: string }) | null>(null);
 
-  const years = useMemo(() => ['All', ...Array.from(new Set((data ?? []).map((item) => String(item.year))))], [data]);
-  const types = useMemo(() => ['All', ...Array.from(new Set((data ?? []).map((item) => item.type)))], [data]);
+  const years = useMemo(() => ['All', ...Array.from(new Set(effectiveData.map((item) => String(item.year))))], [effectiveData]);
+  const types = useMemo(() => ['All', ...Array.from(new Set(effectiveData.map((item) => item.type)))], [effectiveData]);
 
-  const filteredItems = useMemo(() => (data ?? []).filter((item) => {
+  const filteredItems = useMemo(() => effectiveData.filter((item) => {
     const matchesSearch = [item.title, item.authors, item.venue, item.abstract, item.citation, item.bibtex, item.keywords.join(' ')]
       .join(' ')
       .toLowerCase()
@@ -36,7 +56,7 @@ export const PublicationsPage = () => {
     toast.success(message);
   };
 
-  if (isLoading) {
+  if (isLoading && !import.meta.env.DEV) {
     return <PageShell><LoadingState message="Loading publications..." /></PageShell>;
   }
 

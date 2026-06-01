@@ -9,13 +9,20 @@ import { EmptyState } from '../components/common/EmptyState';
 export const TeachingPage = () => {
   const { data, isLoading } = useCollectionQuery<(TeachingItem & { id: string })>(['teaching'], 'teaching');
 
-  if (isLoading) {
+  const sampleTeaching: (TeachingItem & { id: string })[] = [
+    { id: 't1', courseName: 'Advanced Machine Learning', courseCode: 'CSE701', semester: 'Fall', year: 2023, description: 'Graduate course on ML methods.' },
+    { id: 't2', courseName: 'Remote Sensing', courseCode: 'CSE502', semester: 'Spring', year: 2022, description: 'Undergraduate remote sensing course.' },
+  ];
+
+  const effectiveData = data ?? (import.meta.env.DEV ? sampleTeaching : []);
+
+  if (isLoading && !import.meta.env.DEV) {
     return <PageShell><LoadingState message="Loading teaching records..." /></PageShell>;
   }
 
-  const totalCourses = data?.length ?? 0;
-  const semesters = new Set((data ?? []).map((item) => item.semester)).size;
-  const years = new Set((data ?? []).map((item) => item.year)).size;
+  const totalCourses = effectiveData?.length ?? 0;
+  const semesters = new Set((effectiveData ?? []).map((item) => item.semester)).size;
+  const years = new Set((effectiveData ?? []).map((item) => item.year)).size;
 
   return (
     <PageShell className="space-y-8 py-10">

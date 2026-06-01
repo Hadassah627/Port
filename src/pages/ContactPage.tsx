@@ -17,8 +17,38 @@ type ContactForm = {
 };
 
 export const ContactPage = () => {
-  const { data: profile, isLoading } = useDocumentQuery<Profile>(['profile', 'main'], 'profile', 'main');
-  const { data: settings } = useDocumentQuery<Settings>(['settings', 'main'], 'settings', 'main');
+  const { data: profile, isLoading: profileLoading } = useDocumentQuery<Profile>(['profile', 'main'], 'profile', 'main');
+  const { data: settings, isLoading: settingsLoading } = useDocumentQuery<Settings>(['settings', 'main'], 'settings', 'main');
+
+  const sampleProfile: Profile = {
+    id: 'main' as any,
+    name: 'Dr. Abduru Sankara Rao, Ph.D.',
+    designation: 'Professor — Department of Computer Science and Engineering',
+    biography: 'Sample biography',
+    photoUrl: '/sir.png',
+    email: 'abduru@rgukt.edu.in',
+    phone: '+91-98765-43210',
+    office: 'CSE Department, RGUKT',
+    mapUrl: '',
+    socialLinks: [],
+    researchInterests: [],
+    keywords: [],
+    education: [],
+    experience: [],
+  } as unknown as Profile;
+
+  const sampleSettings: Settings = {
+    siteTitle: 'Faculty Portfolio',
+    seoTitle: 'Dr. Abduru Sankara Rao',
+    seoDescription: 'Faculty portfolio',
+    ogImageUrl: '/sir.png',
+    contactEmail: 'abduru@rgukt.edu.in',
+    contactPhone: '+91-98765-43210',
+    socialLinks: [],
+  } as Settings;
+
+  const effectiveProfile = profile ?? (import.meta.env.DEV ? sampleProfile : null);
+  const effectiveSettings = settings ?? (import.meta.env.DEV ? sampleSettings : null);
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<ContactForm>();
 
   const onSubmit = async (values: ContactForm) => {
@@ -32,7 +62,7 @@ export const ContactPage = () => {
     }
   };
 
-  if (isLoading) {
+  if ((profileLoading || settingsLoading) && !import.meta.env.DEV) {
     return <PageShell><LoadingState message="Loading contact details..." /></PageShell>;
   }
 
@@ -44,13 +74,13 @@ export const ContactPage = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="rounded-[1.8rem] border border-white/10 bg-ink-950 p-6 text-white shadow-glow">
           <h3 className="font-heading text-2xl font-semibold">Contact details</h3>
           <div className="mt-6 grid gap-4 text-sm text-white/70">
-            <div className="flex items-center gap-3"><FiMail className="text-gold-300" /> {profile?.email || settings?.contactEmail || 'Email from Firebase'}</div>
-            <div className="flex items-center gap-3"><FiPhone className="text-gold-300" /> {profile?.phone || settings?.contactPhone || 'Phone from Firebase'}</div>
-            <div className="flex items-center gap-3"><FiMapPin className="text-gold-300" /> {profile?.office || 'Office from Firebase'}</div>
+            <div className="flex items-center gap-3"><FiMail className="text-gold-300" /> {effectiveProfile?.email || effectiveSettings?.contactEmail || 'Email from Firebase'}</div>
+            <div className="flex items-center gap-3"><FiPhone className="text-gold-300" /> {effectiveProfile?.phone || effectiveSettings?.contactPhone || 'Phone from Firebase'}</div>
+            <div className="flex items-center gap-3"><FiMapPin className="text-gold-300" /> {effectiveProfile?.office || 'Office from Firebase'}</div>
           </div>
 
-          {profile?.mapUrl ? (
-            <iframe title="Office map" src={profile.mapUrl} className="mt-8 h-72 w-full rounded-[1.4rem] border-0" loading="lazy" />
+          {effectiveProfile?.mapUrl ? (
+            <iframe title="Office map" src={effectiveProfile.mapUrl} className="mt-8 h-72 w-full rounded-[1.4rem] border-0" loading="lazy" />
           ) : null}
         </motion.div>
 

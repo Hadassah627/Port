@@ -35,23 +35,43 @@ export const ProfileEditor = () => {
   const { data, isLoading } = useDocumentQuery<Profile>(['profile', 'main'], 'profile', 'main');
   const { register, control, handleSubmit, reset, formState: { isSubmitting } } = useForm<ProfileForm>({ defaultValues: emptyProfile });
 
+  const sampleProfile: Profile = {
+    name: 'Dr. Abduru Sankara Rao, Ph.D.',
+    designation: 'Professor — Department of Computer Science and Engineering',
+    department: 'Computer Science and Engineering',
+    institution: 'RGUKT',
+    biography: 'Sample biography for development.',
+    photoUrl: '/sir.png',
+    email: 'abduru@rgukt.edu.in',
+    phone: '+91-98765-43210',
+    office: 'CSE Department, RGUKT',
+    mapUrl: '',
+    socialLinks: [{ label: 'Email Me', url: 'mailto:abduru@rgukt.edu.in' }],
+    researchInterests: ['Artificial Intelligence', 'Remote Sensing'],
+    keywords: ['AI', 'Remote Sensing'],
+    education: emptyProfile.education,
+    experience: emptyProfile.experience,
+  };
+
+  const effectiveData = data ?? (import.meta.env.DEV ? sampleProfile : null);
+
   const socialLinks = useFieldArray({ control, name: 'socialLinks' });
   const education = useFieldArray({ control, name: 'education' });
   const experience = useFieldArray({ control, name: 'experience' });
 
   useEffect(() => {
-    if (data) {
+    if (effectiveData) {
       reset({
         ...emptyProfile,
-        ...data,
-        researchInterests: data.researchInterests ?? [],
-        keywords: data.keywords ?? [],
-        education: data.education ?? emptyProfile.education,
-        experience: data.experience ?? emptyProfile.experience,
-        socialLinks: data.socialLinks ?? emptyProfile.socialLinks,
+        ...effectiveData,
+        researchInterests: effectiveData.researchInterests ?? [],
+        keywords: effectiveData.keywords ?? [],
+        education: effectiveData.education ?? emptyProfile.education,
+        experience: effectiveData.experience ?? emptyProfile.experience,
+        socialLinks: effectiveData.socialLinks ?? emptyProfile.socialLinks,
       });
     }
-  }, [data, reset]);
+  }, [effectiveData, reset]);
 
   const submitProfile = async (values: ProfileForm) => {
     try {
@@ -85,7 +105,7 @@ export const ProfileEditor = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading && !import.meta.env.DEV) {
     return <LoadingState message="Loading profile settings..." />;
   }
 
@@ -159,7 +179,7 @@ export const ProfileEditor = () => {
               Profile Photo
               <input type="file" accept="image/*" {...register('photoUpload')} className="rounded-2xl border border-dashed border-ink-300 bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-ink-950/60 dark:text-white" />
             </label>
-            {data?.photoUrl ? <img src={data.photoUrl} alt={data.name} className="h-64 w-full rounded-3xl object-cover" /> : null}
+            {effectiveData?.photoUrl ? <img src={effectiveData.photoUrl} alt={effectiveData.name} className="h-64 w-full rounded-3xl object-cover" /> : null}
 
             <div className="rounded-3xl border border-white/10 bg-ink-50 p-4 dark:bg-white/5">
               <div className="flex items-center justify-between">

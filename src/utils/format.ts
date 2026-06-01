@@ -6,19 +6,47 @@ export const truncate = (value: string, length = 140) => {
   return `${value.slice(0, length).trim()}...`;
 };
 
-export const toCommaList = (value: string[] | undefined) => (value && value.length ? value.join(', ') : '');
+export const toCommaList = (value: string[] | string | undefined | null) => {
+  if (Array.isArray(value)) {
+    return value.length ? value.join(', ') : '';
+  }
 
-export const splitCommaList = (value: string) =>
-  value
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  return '';
+};
+
+export const splitCommaList = (value: unknown) => {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item).trim()).filter(Boolean);
+  }
+
+  if (typeof value !== 'string') {
+    return [];
+  }
+
+  return value
     .split(',')
     .map((item) => item.trim())
     .filter(Boolean);
+};
 
-export const splitLines = (value: string) =>
-  value
+export const splitLines = (value: unknown) => {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item).trim()).filter(Boolean);
+  }
+
+  if (typeof value !== 'string') {
+    return [];
+  }
+
+  return value
     .split('\n')
     .map((item) => item.trim())
     .filter(Boolean);
+};
 
 export const slugify = (value: string) =>
   value

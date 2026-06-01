@@ -13,11 +13,16 @@ export const GalleryPage = () => {
   const { data, isLoading } = useCollectionQuery<(GalleryItem & { id: string })>(['gallery'], 'gallery');
   const [filter, setFilter] = useState('All');
   const [selectedItem, setSelectedItem] = useState<(GalleryItem & { id: string }) | null>(null);
+  const sampleGallery: (GalleryItem & { id: string })[] = [
+    { id: 'g1', title: 'Field Campaign 2023', category: 'Field', imageUrl: '', description: 'Field data collection', year: 2023 },
+  ];
 
-  const categories = useMemo(() => ['All', ...new Set((data ?? []).map((item) => item.category).filter(Boolean))], [data]);
-  const filteredItems = useMemo(() => (data ?? []).filter((item) => filter === 'All' || item.category === filter), [data, filter]);
+  const effectiveData = data ?? (import.meta.env.DEV ? sampleGallery : []);
 
-  if (isLoading) {
+  const categories = useMemo(() => ['All', ...new Set((effectiveData ?? []).map((item) => item.category).filter(Boolean))], [effectiveData]);
+  const filteredItems = useMemo(() => (effectiveData ?? []).filter((item) => filter === 'All' || item.category === filter), [effectiveData, filter]);
+
+  if (isLoading && !import.meta.env.DEV) {
     return <PageShell><LoadingState message="Loading gallery..." /></PageShell>;
   }
 

@@ -21,7 +21,7 @@ export const AdminLoginPage = () => {
 
     try {
       await login(values.email, values.password);
-      navigate('/admin', { replace: true });
+      navigate('/admin/dashboard', { replace: true });
       toast.success('Signed in');
     } catch (error) {
       console.error(error);
@@ -32,7 +32,7 @@ export const AdminLoginPage = () => {
 
   useEffect(() => {
     if (!loading && firebaseUser && isAdmin) {
-      navigate('/admin', { replace: true });
+      navigate('/admin/dashboard', { replace: true });
     }
   }, [firebaseUser, isAdmin, loading, navigate]);
 

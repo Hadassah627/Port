@@ -17,9 +17,40 @@ export const ResearchPage = () => {
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [selectedItem, setSelectedItem] = useState<(ResearchItem & { id: string }) | null>(null);
 
-  const categories = useMemo(() => ['All', ...new Set((data ?? []).map((item) => item.category).filter(Boolean))], [data]);
+  const sampleResearch: (ResearchItem & { id: string })[] = [
+    {
+      id: 'r1',
+      title: 'Scalable Hyperspectral Imaging',
+      slug: 'hyperspectral-imaging',
+      category: 'Remote Sensing',
+      description: 'Developing scalable algorithms for hyperspectral image analysis.',
+      objectives: 'Build scalable ML pipelines',
+      methodology: 'Deep learning + domain adaptation',
+      results: 'Improved classification accuracy on field data',
+      status: 'Active',
+      imageUrls: [],
+      fileUrls: [],
+    },
+    {
+      id: 'r2',
+      title: 'Explainable AI for Geospatial Data',
+      slug: 'explainable-ai-geospatial',
+      category: 'AI',
+      description: 'Interpretable models for remote sensing applications.',
+      objectives: 'Increase explainability',
+      methodology: 'Model distillation and attention maps',
+      results: 'Better model transparency',
+      status: 'Draft',
+      imageUrls: [],
+      fileUrls: [],
+    },
+  ];
 
-  const filteredItems = useMemo(() => (data ?? []).filter((item) => {
+  const effectiveData = data ?? (import.meta.env.DEV ? sampleResearch : []);
+
+  const categories = useMemo(() => ['All', ...new Set(effectiveData.map((item) => item.category).filter(Boolean))], [effectiveData]);
+
+  const filteredItems = useMemo(() => effectiveData.filter((item) => {
     const matchesSearch = [item.title, item.category, item.description, item.objectives, item.methodology, item.results]
       .join(' ')
       .toLowerCase()
@@ -28,8 +59,7 @@ export const ResearchPage = () => {
     const matchesCategory = categoryFilter === 'All' || item.category === categoryFilter;
     return matchesSearch && matchesStatus && matchesCategory;
   }), [categoryFilter, data, searchTerm, statusFilter]);
-
-  if (isLoading) {
+  if (isLoading && !import.meta.env.DEV) {
     return <PageShell><LoadingState message="Loading research projects..." /></PageShell>;
   }
 
