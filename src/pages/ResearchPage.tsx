@@ -58,7 +58,7 @@ export const ResearchPage = () => {
     const matchesStatus = statusFilter === 'All' || item.status === statusFilter;
     const matchesCategory = categoryFilter === 'All' || item.category === categoryFilter;
     return matchesSearch && matchesStatus && matchesCategory;
-  }), [categoryFilter, data, searchTerm, statusFilter]);
+  }), [categoryFilter, effectiveData, searchTerm, statusFilter]);
   if (isLoading && !import.meta.env.DEV) {
     return <PageShell><LoadingState message="Loading research projects..." /></PageShell>;
   }

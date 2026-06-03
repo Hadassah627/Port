@@ -43,17 +43,18 @@ const normalizeFormValues = <T extends Record<string, any>>(config: CollectionCo
   return values;
 };
 
+const sampleItemsByCollection: Record<string, Array<Record<string, unknown>>> = {
+  research: [{ id: 'sample-research', title: 'Sample Research Project', category: 'AI', description: 'Sample research description.', objectives: 'Sample objectives.', methodology: 'Sample methodology.', results: 'Sample results.', status: 'Active', imageUrls: [], fileUrls: [] }],
+  publications: [{ id: 'sample-publication', title: 'Sample Publication', authors: 'Dr. A, Dr. B', venue: 'Sample Journal', year: new Date().getFullYear(), type: 'Journal', doi: '', pdfUrl: '', abstract: 'Sample abstract.', keywords: [], citation: 'Sample citation', bibtex: '@article{sample}', featured: false }],
+  teaching: [{ id: 'sample-teaching', courseName: 'Sample Course', courseCode: 'CSE000', semester: 'Spring', year: new Date().getFullYear(), description: 'Sample teaching description.', credits: '', level: '' }],
+  gallery: [{ id: 'sample-gallery', title: 'Sample Gallery Item', category: 'Events', imageUrl: '', description: 'Sample gallery description.', year: new Date().getFullYear(), featured: false }],
+  achievements: [{ id: 'sample-achievement', title: 'Sample Achievement', value: '1+', description: 'Sample achievement description.', icon: 'star' }],
+};
+
 export const CollectionManager = <T extends Record<string, any>>({ config, sectionId }: CollectionManagerProps<T>) => {
   const queryClient = useQueryClient();
   const { data, isLoading } = useCollectionQuery<(T & { id: string })>([config.collectionPath], config.collectionPath);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const sampleItemsByCollection: Record<string, Array<Record<string, unknown>>> = {
-    research: [{ id: 'sample-research', title: 'Sample Research Project', category: 'AI', description: 'Sample research description.', objectives: 'Sample objectives.', methodology: 'Sample methodology.', results: 'Sample results.', status: 'Active', imageUrls: [], fileUrls: [] }],
-    publications: [{ id: 'sample-publication', title: 'Sample Publication', authors: 'Dr. A, Dr. B', venue: 'Sample Journal', year: new Date().getFullYear(), type: 'Journal', doi: '', pdfUrl: '', abstract: 'Sample abstract.', keywords: [], citation: 'Sample citation', bibtex: '@article{sample}', featured: false }],
-    teaching: [{ id: 'sample-teaching', courseName: 'Sample Course', courseCode: 'CSE000', semester: 'Spring', year: new Date().getFullYear(), description: 'Sample teaching description.', credits: '', level: '' }],
-    gallery: [{ id: 'sample-gallery', title: 'Sample Gallery Item', category: 'Events', imageUrl: '', description: 'Sample gallery description.', year: new Date().getFullYear(), featured: false }],
-    achievements: [{ id: 'sample-achievement', title: 'Sample Achievement', value: '1+', description: 'Sample achievement description.', icon: 'star' }],
-  };
 
   const effectiveData = data ?? (import.meta.env.DEV ? (sampleItemsByCollection[config.collectionPath] as Array<T & { id: string }>) : []);
   const editingItem = useMemo(() => effectiveData?.find((item) => item.id === editingId) ?? null, [effectiveData, editingId]);
@@ -109,8 +110,8 @@ export const CollectionManager = <T extends Record<string, any>>({ config, secti
       }
 
       if (field.type === 'image' || field.type === 'file') {
-        const input = document.querySelector<HTMLInputElement>(`input[name="${field.name}"]`);
-        const selectedFiles = input?.files ? Array.from(input.files) : [];
+        const fileList = values[field.name] as FileList | null | undefined;
+        const selectedFiles = fileList instanceof FileList ? Array.from(fileList) : [];
 
         if (selectedFiles.length > 0) {
           const folder = `${config.collectionPath}/${field.name}`;
@@ -134,10 +135,10 @@ export const CollectionManager = <T extends Record<string, any>>({ config, secti
     try {
       if (editingId) {
         await updateDocument(config.collectionPath, editingId, payload as Partial<T>);
-        toast.success(`${config.title} updated`);
+        toast.success('Updated successfully!');
       } else {
         await createDocument(config.collectionPath, payload as T);
-        toast.success(`${config.title} created`);
+        toast.success('Submitted successfully!');
       }
 
       reset(normalizeFormValues(config, null));
@@ -184,7 +185,13 @@ export const CollectionManager = <T extends Record<string, any>>({ config, secti
       </div>
 
       <div className="mt-6 grid gap-8 xl:grid-cols-[1.05fr_1.4fr]">
-        <form onSubmit={handleSubmit(submitForm)} className="rounded-[1.8rem] border border-white/10 bg-ink-50 p-5 dark:bg-white/5">
+        <form
+          onSubmit={handleSubmit(submitForm, (errors) => {
+            console.error(`${config.title} form errors:`, errors);
+            toast.error('Please check the form fields for errors');
+          })}
+          className="rounded-[1.8rem] border border-white/10 bg-ink-50 p-5 dark:bg-white/5"
+        >
           <div className="mb-4 flex items-center justify-between">
             <h4 className="text-base font-semibold text-ink-900 dark:text-white">{editingId ? 'Edit item' : 'New item'}</h4>
             <button

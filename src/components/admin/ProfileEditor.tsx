@@ -10,7 +10,11 @@ import { useDocumentQuery } from '../../hooks/useDocumentQuery';
 import { splitCommaList, toCommaList } from '../../utils/format';
 import { LoadingState } from '../common/LoadingState';
 
-type ProfileForm = Profile & { photoUpload?: FileList | null };
+type ProfileForm = Omit<Profile, 'researchInterests' | 'keywords'> & {
+  researchInterests: string;
+  keywords: string;
+  photoUpload?: FileList | null;
+};
 
 const emptyProfile: ProfileForm = {
   name: '',
@@ -24,34 +28,34 @@ const emptyProfile: ProfileForm = {
   office: '',
   mapUrl: '',
   socialLinks: [{ label: '', url: '' }],
-  researchInterests: [],
-  keywords: [],
+  researchInterests: '',
+  keywords: '',
   education: [{ degree: '', university: '', year: '', description: '' }],
   experience: [{ position: '', organization: '', years: '', description: '' }],
+};
+
+const sampleProfile: Profile = {
+  name: 'Dr. Abduru Sankara Rao, Ph.D.',
+  designation: 'Professor — Department of Computer Science and Engineering',
+  department: 'Computer Science and Engineering',
+  institution: 'RGUKT',
+  biography: 'Sample biography for development.',
+  photoUrl: '/sir.png',
+  email: 'abduru@rgukt.edu.in',
+  phone: '+91-98765-43210',
+  office: 'CSE Department, RGUKT',
+  mapUrl: '',
+  socialLinks: [{ label: 'Email Me', url: 'mailto:abduru@rgukt.edu.in' }],
+  researchInterests: ['Artificial Intelligence', 'Remote Sensing'],
+  keywords: ['AI', 'Remote Sensing'],
+  education: emptyProfile.education as any,
+  experience: emptyProfile.experience as any,
 };
 
 export const ProfileEditor = () => {
   const queryClient = useQueryClient();
   const { data, isLoading } = useDocumentQuery<Profile>(['profile', 'main'], 'profile', 'main');
   const { register, control, handleSubmit, reset, formState: { isSubmitting } } = useForm<ProfileForm>({ defaultValues: emptyProfile });
-
-  const sampleProfile: Profile = {
-    name: 'Dr. Abduru Sankara Rao, Ph.D.',
-    designation: 'Professor — Department of Computer Science and Engineering',
-    department: 'Computer Science and Engineering',
-    institution: 'RGUKT',
-    biography: 'Sample biography for development.',
-    photoUrl: '/sir.png',
-    email: 'abduru@rgukt.edu.in',
-    phone: '+91-98765-43210',
-    office: 'CSE Department, RGUKT',
-    mapUrl: '',
-    socialLinks: [{ label: 'Email Me', url: 'mailto:abduru@rgukt.edu.in' }],
-    researchInterests: ['Artificial Intelligence', 'Remote Sensing'],
-    keywords: ['AI', 'Remote Sensing'],
-    education: emptyProfile.education,
-    experience: emptyProfile.experience,
-  };
 
   const effectiveData = data ?? (import.meta.env.DEV ? sampleProfile : null);
 
@@ -64,12 +68,12 @@ export const ProfileEditor = () => {
       reset({
         ...emptyProfile,
         ...effectiveData,
-        researchInterests: effectiveData.researchInterests ?? [],
-        keywords: effectiveData.keywords ?? [],
+        researchInterests: toCommaList(effectiveData.researchInterests ?? []),
+        keywords: toCommaList(effectiveData.keywords ?? []),
         education: effectiveData.education ?? emptyProfile.education,
         experience: effectiveData.experience ?? emptyProfile.experience,
         socialLinks: effectiveData.socialLinks ?? emptyProfile.socialLinks,
-      });
+      } as any);
     }
   }, [effectiveData, reset]);
 
@@ -89,20 +93,25 @@ export const ProfileEditor = () => {
         phone: values.phone,
         office: values.office,
         mapUrl: values.mapUrl,
-        socialLinks: values.socialLinks.filter((item) => item.label || item.url),
-        researchInterests: values.researchInterests,
-        keywords: values.keywords,
-        education: values.education.filter((item) => item.degree || item.university || item.year || item.description),
-        experience: values.experience.filter((item) => item.position || item.organization || item.years || item.description),
+        socialLinks: (values.socialLinks || []).filter((item) => item && (item.label || item.url)),
+        researchInterests: splitCommaList(values.researchInterests || ''),
+        keywords: splitCommaList(values.keywords || ''),
+        education: (values.education || []).filter((item) => item && (item.degree || item.university || item.year || item.description)),
+        experience: (values.experience || []).filter((item) => item && (item.position || item.organization || item.years || item.description)),
       };
 
       await updateDocument('profile', 'main', payload);
       await queryClient.invalidateQueries({ queryKey: ['profile', 'main'] });
-      toast.success('Profile updated');
+      toast.success('Profile updated successfully');
     } catch (error) {
       console.error(error);
       toast.error('Unable to update profile');
     }
+  };
+
+  const onFormError = (errors: any) => {
+    console.error('Profile form errors:', errors);
+    toast.error('Please check the form for errors');
   };
 
   if (isLoading && !import.meta.env.DEV) {
@@ -116,7 +125,7 @@ export const ProfileEditor = () => {
         <h3 className="font-heading text-2xl font-semibold text-ink-900 dark:text-white">Manage faculty profile</h3>
       </div>
 
-      <form onSubmit={handleSubmit(submitProfile)} className="mt-6 grid gap-6">
+      <form onSubmit={handleSubmit(submitProfile, onFormError)} className="mt-6 grid gap-6">
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="grid gap-4">
             <div className="grid gap-4 md:grid-cols-2">
@@ -165,12 +174,12 @@ export const ProfileEditor = () => {
 
             <label className="grid gap-2 text-sm font-medium text-ink-700 dark:text-white/80">
               Research Interests
-              <textarea rows={3} defaultValue={toCommaList(data?.researchInterests)} {...register('researchInterests', { setValueAs: (value) => splitCommaList(value) })} className="rounded-2xl border border-ink-200 bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-ink-950/60 dark:text-white" />
+              <textarea rows={3} {...register('researchInterests')} className="rounded-2xl border border-ink-200 bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-ink-950/60 dark:text-white" />
             </label>
 
             <label className="grid gap-2 text-sm font-medium text-ink-700 dark:text-white/80">
               Keywords
-              <textarea rows={3} defaultValue={toCommaList(data?.keywords)} {...register('keywords', { setValueAs: (value) => splitCommaList(value) })} className="rounded-2xl border border-ink-200 bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-ink-950/60 dark:text-white" />
+              <textarea rows={3} {...register('keywords')} className="rounded-2xl border border-ink-200 bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-ink-950/60 dark:text-white" />
             </label>
           </div>
 

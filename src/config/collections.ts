@@ -47,7 +47,7 @@ export const researchConfig: CollectionConfig<ResearchItem> = {
         { label: 'Completed', value: 'Completed' },
       ],
     },
-    { name: 'featured', label: 'Featured', type: 'toggle' },
+    { name: 'featured', label: 'Add in highlights', type: 'toggle' },
     { name: 'imageUrls', label: 'Research Images', type: 'image', multiple: true, accept: 'image/*' },
     { name: 'fileUrls', label: 'Research Files', type: 'file', multiple: true, accept: '.pdf,.doc,.docx,.ppt,.pptx' },
   ],

@@ -42,7 +42,7 @@ export const TeachingPage = () => {
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
-        {(data ?? []).map((item) => (
+        {(effectiveData ?? []).map((item) => (
           <motion.article key={item.id} whileHover={{ y: -4 }} className="rounded-[1.8rem] border border-white/10 bg-ink-50 p-6 dark:bg-white/5">
             <div className="flex items-center justify-between gap-3">
               <span className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-500 dark:text-gold-300">{item.courseCode}</span>

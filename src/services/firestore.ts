@@ -52,10 +52,10 @@ export const createDocument = async <T extends DocumentData>(path: string, data:
 };
 
 export const updateDocument = async <T extends DocumentData>(path: string, id: string, data: Partial<T>) =>
-  updateDoc(doc(db, path, id), {
+  setDoc(doc(db, path, id), {
     ...data,
     updatedAt: serverTimestamp(),
-  });
+  }, { merge: true });
 
 export const deleteDocument = async (path: string, id: string) => deleteDoc(doc(db, path, id));
 

@@ -105,6 +105,12 @@ export type MessageItem = {
   read?: boolean;
 };
 
+export type NewsItem = {
+  date: string;
+  title: string;
+  description: string;
+};
+
 export type Settings = {
   siteTitle: string;
   seoTitle: string;
@@ -113,7 +119,9 @@ export type Settings = {
   contactEmail: string;
   contactPhone: string;
   socialLinks: SocialLink[];
+  news?: NewsItem[];
 };
+
 
 export type UserRole = 'admin' | 'editor' | 'viewer';
 

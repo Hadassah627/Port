@@ -14,47 +14,47 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isAdmin() || (isSignedIn() && request.auth.uid == userId);
-      allow write: if isAdmin();
+      allow write: if isSignedIn();
     }
 
     match /profile/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isSignedIn();
     }
 
     match /research/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isSignedIn();
     }
 
     match /publications/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isSignedIn();
     }
 
     match /teaching/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isSignedIn();
     }
 
     match /gallery/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isSignedIn();
     }
 
     match /achievements/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isSignedIn();
     }
 
     match /messages/{docId} {
       allow create: if true;
-      allow read, update, delete: if isAdmin();
+      allow read, update, delete: if isSignedIn();
     }
 
     match /settings/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isSignedIn();
     }
   }
 }

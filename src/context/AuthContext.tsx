@@ -30,11 +30,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
-        setLoading(false);
+        const profilePromise = loadUserProfile(user.uid);
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Session timeout')), 7000)
+        );
 
-        void loadUserProfile(user.uid)
-          .then((profile) => setUserProfile(profile))
-          .catch(() => setUserProfile(null));
+        Promise.race([profilePromise, timeoutPromise])
+          .then((profile) => {
+            setUserProfile(profile);
+            setLoading(false);
+          })
+          .catch((error) => {
+            console.error('Profile loading error or timeout:', error);
+            setUserProfile(null);
+            setLoading(false);
+          });
       }),
     []
   );
@@ -44,7 +54,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     userProfile,
     loading,
     login: async (email, password) => {
-      await loginWithEmail(email, password);
+      setLoading(true);
+      try {
+        const userCredential = await loginWithEmail(email, password);
+        const profile = await loadUserProfile(userCredential.user.uid);
+
+        if (!profile || profile.role !== 'admin') {
+          throw new Error('Unauthorized: Admin role required.');
+        }
+
+        setFirebaseUser(userCredential.user);
+        setUserProfile(profile);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        throw error;
+      }
     },
     signOut: async () => {
       await logout();
