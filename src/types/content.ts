@@ -36,8 +36,8 @@ export type ResearchItem = {
   methodology: string;
   results: string;
   status: 'Draft' | 'Active' | 'Completed';
-  imageUrls: string[];
-  fileUrls: string[];
+  imageUrls?: string[];
+  fileUrls?: string[];
   featured?: boolean;
 };
 
@@ -70,10 +70,12 @@ export type TeachingItem = {
 export type GalleryItem = {
   title: string;
   category: string;
-  imageUrl: string;
+  coverImage?: string;
+  driveLink: string;
   description: string;
   year: number;
-  featured?: boolean;
+  createdAt?: FirestoreDateLike;
+  updatedAt?: FirestoreDateLike;
 };
 
 export type AchievementItem = {

@@ -116,16 +116,6 @@ export const Navbar = () => {
             >
               {theme === 'dark' ? <FiSun className="text-gold-300" /> : <FiMoon className="text-ink-700" />}
             </button>
-
-            {/* Admin Badge */}
-            {firebaseUser && isAdmin && (
-              <Link
-                to="/admin/dashboard"
-                className="ml-3 rounded-full bg-gold-400/10 px-4 py-1.5 text-xs font-semibold text-gold-600 border border-gold-400/20 hover:bg-gold-400/20 transition-all dark:text-gold-300"
-              >
-                Admin Panel
-              </Link>
-            )}
           </nav>
 
           {/* Mobile Right Controls */}
@@ -195,14 +185,6 @@ export const Navbar = () => {
                   );
                 })}
 
-                {firebaseUser && isAdmin && (
-                  <Link
-                    to="/admin/dashboard"
-                    className="flex justify-center rounded-2xl bg-gold-400/10 px-5 py-4 text-sm font-bold text-gold-600 border border-gold-400/20 dark:text-gold-300"
-                  >
-                    Go to Admin Dashboard
-                  </Link>
-                )}
               </div>
             </motion.div>
           </>

@@ -35,7 +35,7 @@ export const Hero: React.FC<HeroProps> = ({ name, designation, institution, bio,
   }, [photoUrl]);
 
   return (
-    <section id="home" className="relative overflow-hidden bg-[radial-gradient(ellipse_at_top,rgba(7,26,53,1)_0%,rgba(5,11,19,1)_100%)] text-white py-16 lg:py-28">
+    <section id="home" className="relative overflow-hidden bg-[radial-gradient(ellipse_at_top,rgba(7,26,53,1)_0%,rgba(5,11,19,1)_100%)] text-white py-12 sm:py-16 lg:py-28">
       {/* Dynamic Animated Particles */}
       <ParticlesBackground className="absolute inset-0 -z-20 opacity-40 pointer-events-none" />
 
@@ -60,7 +60,7 @@ export const Hero: React.FC<HeroProps> = ({ name, designation, institution, bio,
             </div>
 
             {/* Title / Name */}
-            <h1 className="font-heading text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl text-white">
+            <h1 className="font-heading text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl text-white">
               {name}
             </h1>
 
@@ -127,7 +127,7 @@ export const Hero: React.FC<HeroProps> = ({ name, designation, institution, bio,
             className="relative flex justify-center lg:justify-end mt-12 lg:mt-0"
           >
             {/* The main profile card container */}
-            <div className="relative z-10 w-72 h-[340px] md:w-80 md:h-[380px] rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-md shadow-2xl">
+            <div className="relative z-10 w-full max-w-[280px] h-[320px] sm:w-72 sm:h-[340px] md:w-80 md:h-[380px] rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-md shadow-2xl">
               <div className="relative w-full h-full overflow-hidden rounded-2xl bg-ink-950">
                 {currentSrc && !imgError ? (
                   <img

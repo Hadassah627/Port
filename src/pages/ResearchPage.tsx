@@ -28,8 +28,6 @@ export const ResearchPage = () => {
       methodology: 'Deep learning + domain adaptation',
       results: 'Improved classification accuracy on field data',
       status: 'Active',
-      imageUrls: [],
-      fileUrls: [],
     },
     {
       id: 'r2',
@@ -41,8 +39,6 @@ export const ResearchPage = () => {
       methodology: 'Model distillation and attention maps',
       results: 'Better model transparency',
       status: 'Draft',
-      imageUrls: [],
-      fileUrls: [],
     },
   ];
 
@@ -83,7 +79,6 @@ export const ResearchPage = () => {
       <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
         {filteredItems.map((item) => (
           <motion.article key={item.id} whileHover={{ y: -4 }} className="overflow-hidden rounded-[1.8rem] border border-white/10 bg-white shadow-soft dark:bg-ink-900">
-            {item.imageUrls?.[0] ? <img src={item.imageUrls[0]} alt={item.title} className="h-52 w-full object-cover" /> : <div className="flex h-52 items-center justify-center bg-ink-100 text-sm text-ink-500 dark:bg-white/5 dark:text-white/50">Research image</div>}
             <div className="p-6">
               <div className="flex items-center justify-between gap-3">
                 <span className="rounded-full bg-gold-400/15 px-3 py-1 text-xs font-semibold text-gold-700 dark:text-gold-200">{item.status}</span>
@@ -110,9 +105,11 @@ export const ResearchPage = () => {
               <div><p className="text-xs uppercase tracking-[0.2em] text-ink-400">Methodology</p><p className="mt-2">{selectedItem.methodology}</p></div>
               <div><p className="text-xs uppercase tracking-[0.2em] text-ink-400">Results</p><p className="mt-2">{selectedItem.results}</p></div>
             </div>
-            <div className="flex flex-wrap gap-3">
-              {selectedItem.fileUrls?.map((url) => <a key={url} href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-ink-900 px-4 py-2 text-xs font-semibold text-white"><FiDownload /> Download file</a>)}
-            </div>
+            {selectedItem.fileUrls && selectedItem.fileUrls.length > 0 && (
+              <div className="flex flex-wrap gap-3">
+                {selectedItem.fileUrls.map((url) => <a key={url} href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-ink-900 px-4 py-2 text-xs font-semibold text-white"><FiDownload /> Download file</a>)}
+              </div>
+            )}
           </div>
         ) : null}
       </Modal>

@@ -1,20 +1,28 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiZoomIn } from 'react-icons/fi';
 import { useCollectionQuery } from '../hooks/useCollectionQuery';
 import type { GalleryItem } from '../types/content';
 import { PageShell } from '../components/common/PageShell';
 import { SectionHeading } from '../components/common/SectionHeading';
 import { LoadingState } from '../components/common/LoadingState';
 import { EmptyState } from '../components/common/EmptyState';
-import { Modal } from '../components/common/Modal';
+import { truncate, resolveDirectImageUrl } from '../utils/format';
+
 
 export const GalleryPage = () => {
   const { data, isLoading } = useCollectionQuery<(GalleryItem & { id: string })>(['gallery'], 'gallery');
   const [filter, setFilter] = useState('All');
-  const [selectedItem, setSelectedItem] = useState<(GalleryItem & { id: string }) | null>(null);
+
   const sampleGallery: (GalleryItem & { id: string })[] = [
-    { id: 'g1', title: 'Field Campaign 2023', category: 'Field', imageUrl: '', description: 'Field data collection', year: 2023 },
+    {
+      id: 'g1',
+      title: 'Field Campaign 2023',
+      category: 'Field',
+      coverImage: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80',
+      driveLink: 'https://drive.google.com',
+      description: 'Field data collection and equipment configuration with the research team.',
+      year: 2023,
+    },
   ];
 
   const effectiveData = data ?? (import.meta.env.DEV ? sampleGallery : []);
@@ -28,7 +36,7 @@ export const GalleryPage = () => {
 
   return (
     <PageShell className="space-y-8 py-10">
-      <SectionHeading eyebrow="Gallery" title="Professional Gallery" description="A responsive, category-filtered gallery with modal zoom." />
+      <SectionHeading eyebrow="Gallery" title="Professional Gallery" description="Explore media albums and folders documenting conference presentations, lab activities, and milestones." />
 
       <div className="flex flex-wrap gap-3">
         {categories.map((category) => (
@@ -38,31 +46,43 @@ export const GalleryPage = () => {
         ))}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {filteredItems.map((item) => (
-          <motion.button key={item.id} whileHover={{ y: -4 }} type="button" onClick={() => setSelectedItem(item)} className="group overflow-hidden rounded-[1.7rem] border border-white/10 bg-white text-left shadow-soft dark:bg-ink-900">
-            {item.imageUrl ? <img src={item.imageUrl} alt={item.title} loading="lazy" className="h-64 w-full object-cover transition duration-500 group-hover:scale-105" /> : <div className="flex h-64 items-center justify-center bg-ink-100 text-sm text-ink-500 dark:bg-white/5 dark:text-white/55">Upload gallery image</div>}
-            <div className="flex items-center justify-between gap-3 p-5">
-              <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-gold-500 dark:text-gold-300">{item.category}</p>
-                <h3 className="mt-2 font-heading text-lg font-semibold text-ink-900 dark:text-white">{item.title}</h3>
+          <motion.div 
+            key={item.id} 
+            whileHover={{ y: -4 }} 
+            className="flex flex-col justify-between overflow-hidden rounded-[1.8rem] border border-white/10 bg-white shadow-soft dark:bg-ink-900 group"
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <span className="rounded-xl bg-gold-400/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-gold-600 dark:text-gold-300">
+                  {item.category}
+                </span>
+                <span className="text-xs font-semibold text-ink-500 dark:text-white/40">
+                  {item.year}
+                </span>
               </div>
-              <FiZoomIn className="text-xl text-gold-600 dark:text-gold-300" />
+              <h3 className="font-heading text-xl font-bold text-ink-900 dark:text-white group-hover:text-gold-500 transition-colors duration-300 leading-snug">
+                {item.title}
+              </h3>
+              <p className="mt-3 text-xs leading-relaxed text-ink-600 dark:text-white/60">
+                {truncate(item.description, 120)}
+              </p>
             </div>
-          </motion.button>
+            <div className="px-6 pb-6 pt-0">
+              <button 
+                type="button" 
+                onClick={() => window.open(item.driveLink, '_blank')} 
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-ink-900 px-4 py-3.5 text-xs font-bold text-white hover:bg-ink-800 transition dark:bg-white dark:text-ink-950 dark:hover:bg-white/90 shadow-sm"
+              >
+                <span>View Album</span>
+              </button>
+            </div>
+          </motion.div>
         ))}
       </div>
 
-      {!filteredItems.length ? <EmptyState title="No gallery items match the filter" description="Upload images and categories in the admin dashboard to populate the gallery." /> : null}
-
-      <Modal open={Boolean(selectedItem)} title={selectedItem?.title || 'Gallery image'} onClose={() => setSelectedItem(null)}>
-        {selectedItem ? (
-          <div className="grid gap-4">
-            {selectedItem.imageUrl ? <img src={selectedItem.imageUrl} alt={selectedItem.title} className="max-h-[70vh] w-full rounded-[1.8rem] object-contain" /> : null}
-            <p className="text-sm leading-7 text-ink-700 dark:text-white/75">{selectedItem.description}</p>
-          </div>
-        ) : null}
-      </Modal>
+      {!filteredItems.length ? <EmptyState title="No gallery items match the filter" description="Create albums in the admin dashboard to populate the gallery." /> : null}
     </PageShell>
   );
 };

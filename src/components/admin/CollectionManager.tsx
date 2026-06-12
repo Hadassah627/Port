@@ -44,10 +44,10 @@ const normalizeFormValues = <T extends Record<string, any>>(config: CollectionCo
 };
 
 const sampleItemsByCollection: Record<string, Array<Record<string, unknown>>> = {
-  research: [{ id: 'sample-research', title: 'Sample Research Project', category: 'AI', description: 'Sample research description.', objectives: 'Sample objectives.', methodology: 'Sample methodology.', results: 'Sample results.', status: 'Active', imageUrls: [], fileUrls: [] }],
+  research: [{ id: 'sample-research', title: 'Sample Research Project', category: 'AI', description: 'Sample research description.', objectives: 'Sample objectives.', methodology: 'Sample methodology.', results: 'Sample results.', status: 'Active' }],
   publications: [{ id: 'sample-publication', title: 'Sample Publication', authors: 'Dr. A, Dr. B', venue: 'Sample Journal', year: new Date().getFullYear(), type: 'Journal', doi: '', pdfUrl: '', abstract: 'Sample abstract.', keywords: [], citation: 'Sample citation', bibtex: '@article{sample}', featured: false }],
   teaching: [{ id: 'sample-teaching', courseName: 'Sample Course', courseCode: 'CSE000', semester: 'Spring', year: new Date().getFullYear(), description: 'Sample teaching description.', credits: '', level: '' }],
-  gallery: [{ id: 'sample-gallery', title: 'Sample Gallery Item', category: 'Events', imageUrl: '', description: 'Sample gallery description.', year: new Date().getFullYear(), featured: false }],
+  gallery: [{ id: 'sample-gallery', title: 'Sample Gallery Item', category: 'Events', coverImage: '', driveLink: '', description: 'Sample gallery description.', year: new Date().getFullYear() }],
   achievements: [{ id: 'sample-achievement', title: 'Sample Achievement', value: '1+', description: 'Sample achievement description.', icon: 'star' }],
 };
 

@@ -118,8 +118,6 @@ export const Footer = () => {
         <div className="mt-16 border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/40">
           <p>© {new Date().getFullYear()} {displayName}. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <Link to="/admin" className="hover:text-gold-300 transition-colors">Faculty Portal Admin</Link>
-            <span>•</span>
             <span className="text-white/30">Stanford, MIT & CMU Grade Design System</span>
           </div>
         </div>

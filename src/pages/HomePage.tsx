@@ -34,6 +34,7 @@ import { Seo } from '../components/Seo';
 import { PageShell } from '../components/common/PageShell';
 import { SectionHeading } from '../components/common/SectionHeading';
 import { LoadingState } from '../components/common/LoadingState';
+import { getEmbedMapUrl, truncate, resolveDirectImageUrl } from '../utils/format';
 
 const COUNTER_DURATION = 1500; // ms
 
@@ -98,7 +99,6 @@ export const HomePage: React.FC = () => {
   const [activeBioTab, setActiveBioTab] = useState<'education' | 'experience'>('education');
   const [copiedPubId, setCopiedPubId] = useState<string | null>(null);
   const [activeBibtexId, setActiveBibtexId] = useState<string | null>(null);
-  const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
 
   // Themed unsplash image array
   const getProjectImage = (title: string, index: number) => {
@@ -148,8 +148,6 @@ export const HomePage: React.FC = () => {
       methodology: 'Deep learning autoencoders combined with parallel GPU clusters',
       results: 'Improved classification accuracy on NASA AVIRIS datasets by 14%',
       status: 'Active',
-      imageUrls: [],
-      fileUrls: [],
       featured: true,
     },
     {
@@ -162,8 +160,6 @@ export const HomePage: React.FC = () => {
       methodology: 'Model distillation coupled with localized attention weight mapping',
       results: 'Introduced novel spatial-spectral feature heatmaps for climate monitors',
       status: 'Completed',
-      imageUrls: [],
-      fileUrls: [],
       featured: false,
     },
   ];
@@ -229,9 +225,9 @@ export const HomePage: React.FC = () => {
   ];
 
   const sampleGallery = [
-    { title: 'Keynote Address at Geoscience Summit', category: 'Conference', imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80', description: 'Presenting research developments on Earth spectral classification models.', year: 2025 },
-    { title: 'Deep Learning Laboratory Workspace', category: 'Research Lab', imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80', description: 'Guiding PhD and research scholars in the geospatial lab.', year: 2025 },
-    { title: 'Group Mentoring Seminar', category: 'Mentorship', imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80', description: 'Bi-weekly thesis review and paper draft editing session.', year: 2024 }
+    { id: 'g1', title: 'Keynote Address at Geoscience Summit', category: 'Conference', coverImage: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80', driveLink: 'https://drive.google.com', description: 'Presenting research developments on Earth spectral classification models.', year: 2025 },
+    { id: 'g2', title: 'Deep Learning Laboratory Workspace', category: 'Research Lab', coverImage: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80', driveLink: 'https://drive.google.com', description: 'Guiding PhD and research scholars in the geospatial lab.', year: 2025 },
+    { id: 'g3', title: 'Group Mentoring Seminar', category: 'Mentorship', coverImage: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80', driveLink: 'https://drive.google.com', description: 'Bi-weekly thesis review and paper draft editing session.', year: 2024 }
   ];
 
   // Effective state bindings
@@ -306,17 +302,6 @@ export const HomePage: React.FC = () => {
     }
   };
 
-  // Lightbox handlers
-  const handlePrevImage = () => {
-    if (activeImageIndex === null) return;
-    setActiveImageIndex((activeImageIndex - 1 + effectiveGallery.length) % effectiveGallery.length);
-  };
-
-  const handleNextImage = () => {
-    if (activeImageIndex === null) return;
-    setActiveImageIndex((activeImageIndex + 1) % effectiveGallery.length);
-  };
-
   return (
     <>
       <Seo
@@ -341,12 +326,12 @@ export const HomePage: React.FC = () => {
       {/* SECTION 2: ACADEMIC HIGHLIGHTS */}
       <section className="relative z-20 mt-8 pb-12">
         <PageShell>
-          <div className={`grid gap-6 ${
+          <div className={`grid gap-4 sm:gap-6 ${
             stats.length === 3 
-              ? 'sm:grid-cols-3' 
+              ? 'grid-cols-1 sm:grid-cols-3' 
               : stats.length === 4 
-              ? 'sm:grid-cols-2 lg:grid-cols-4' 
-              : 'sm:grid-cols-2 lg:grid-cols-6'
+              ? 'grid-cols-2 lg:grid-cols-4' 
+              : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'
           }`}>
             {stats.map((s) => (
               <StatCard 
@@ -413,7 +398,7 @@ export const HomePage: React.FC = () => {
 
                 {/* Switcher Tab Indicators */}
                 <div className="space-y-6">
-                  <div className="flex border-b border-black/5 dark:border-white/10 gap-8">
+                  <div className="flex border-b border-black/5 dark:border-white/10 gap-4 sm:gap-8">
                     <button
                       onClick={() => setActiveBioTab('education')}
                       className={`pb-3 text-sm font-semibold uppercase tracking-wider transition-colors relative ${
@@ -548,7 +533,7 @@ export const HomePage: React.FC = () => {
                   {/* Project image with overlays */}
                   <div className="relative h-48 overflow-hidden bg-ink-950">
                     <img 
-                      src={project.imageUrls?.[0] || getProjectImage(project.title, idx)} 
+                      src={getProjectImage(project.title, idx)} 
                       alt={project.title} 
                       className="h-full w-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" 
                     />
@@ -827,37 +812,49 @@ export const HomePage: React.FC = () => {
         {/* SECTION 9: GALLERY PREVIEW */}
         <section id="gallery" className="scroll-mt-24">
           <PageShell>
-            <SectionHeading eyebrow="Campus Life" title="Geospatial Media Gallery" description="Images from presentations, research lab desks, and academic group panels." />
+            <SectionHeading eyebrow="Campus Life" title="Geospatial Media Gallery" description="Explore media albums documenting conference presentations, lab activities, and milestones." />
 
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {effectiveGallery.map((img, idx) => (
-                <motion.div
-                  key={idx}
-                  onClick={() => setActiveImageIndex(idx)}
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -4 }}
-                  className="overflow-hidden rounded-3xl border border-black/5 bg-white shadow-soft dark:border-white/5 dark:bg-ink-900/60 group cursor-pointer animate-fade-in"
+              {effectiveGallery.slice(0, 3).map((item) => (
+                <motion.div 
+                  key={item.id || item.title} 
+                  whileHover={{ y: -4 }} 
+                  className="flex flex-col justify-between overflow-hidden rounded-[1.8rem] border border-white/10 bg-white shadow-soft dark:border-white/5 dark:bg-ink-900/60 group"
                 >
-                  <div className="relative h-56 overflow-hidden bg-ink-950">
-                    <img 
-                      src={img.imageUrl} 
-                      alt={img.title} 
-                      className="h-full w-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500" 
-                    />
-                    <div className="absolute bottom-4 left-4 right-4 z-10 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                      <span className="rounded-lg bg-ink-950/80 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-gold-300 backdrop-blur-sm">
-                        {img.category}
+                  <div className="p-6">
+                    <div className="flex items-center justify-between gap-3 mb-4">
+                      <span className="rounded-xl bg-gold-400/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-gold-600 dark:text-gold-300">
+                        {item.category}
                       </span>
-                      <h4 className="font-heading text-sm font-bold text-white mt-2 leading-tight drop-shadow-md">
-                        {img.title}
-                      </h4>
+                      <span className="text-xs font-semibold text-ink-500 dark:text-white/40">
+                        {item.year}
+                      </span>
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <h3 className="font-heading text-xl font-bold text-ink-900 dark:text-white group-hover:text-gold-500 transition-colors duration-300 leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="mt-3 text-xs leading-relaxed text-ink-600 dark:text-white/60">
+                      {truncate(item.description, 120)}
+                    </p>
+                  </div>
+                  <div className="px-6 pb-6 pt-0">
+                    <button 
+                      type="button" 
+                      onClick={() => window.open(item.driveLink, '_blank')} 
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-ink-900 px-4 py-3.5 text-xs font-bold text-white hover:bg-ink-800 transition dark:bg-white dark:text-ink-950 dark:hover:bg-white/90 shadow-sm"
+                    >
+                      <span>View Album</span>
+                    </button>
                   </div>
                 </motion.div>
               ))}
+            </div>
+
+            <div className="mt-8 flex justify-center">
+              <Link to="/gallery" className="inline-flex items-center gap-2 rounded-full border border-gold-400/30 px-6 py-3 text-sm font-semibold text-gold-500 hover:bg-gold-400/5 transition-all dark:text-gold-300">
+                <span>View Full Gallery</span>
+                <FiArrowRight />
+              </Link>
             </div>
           </PageShell>
         </section>
@@ -901,10 +898,10 @@ export const HomePage: React.FC = () => {
                   </div>
                 </div>
 
-                {effectiveProfile?.mapUrl ? (
+               {effectiveProfile?.mapUrl ? (
                   <iframe 
                     title="Faculty Office Map" 
-                    src={effectiveProfile.mapUrl} 
+                    src={getEmbedMapUrl(effectiveProfile.mapUrl, `${effectiveProfile.office || ''}, ${effectiveProfile.institution || ''}`)} 
                     className="h-60 w-full rounded-2xl border-0 bg-ink-950/40" 
                     loading="lazy" 
                   />
@@ -994,71 +991,7 @@ export const HomePage: React.FC = () => {
 
       </div>
 
-      {/* LIGHTBOX SLIDER MODAL */}
-      <AnimatePresence>
-        {activeImageIndex !== null && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-md"
-          >
-            <div className="absolute inset-0" onClick={() => setActiveImageIndex(null)} />
 
-            <div className="relative z-10 max-w-4xl w-full flex flex-col items-center">
-              
-              <button
-                onClick={() => setActiveImageIndex(null)}
-                className="absolute right-0 top-[-45px] flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
-              >
-                <FiX size={20} />
-              </button>
-
-              <div className="relative flex items-center w-full justify-center">
-                <button
-                  onClick={handlePrevImage}
-                  className="absolute left-[-20px] md:left-[-60px] flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors z-20"
-                >
-                  <FiChevronLeft size={24} />
-                </button>
-
-                <motion.div
-                  key={activeImageIndex}
-                  initial={{ scale: 0.95, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.25 }}
-                  className="overflow-hidden rounded-3xl bg-ink-950 border border-white/10 shadow-2xl"
-                >
-                  <img
-                    src={effectiveGallery[activeImageIndex].imageUrl}
-                    alt={effectiveGallery[activeImageIndex].title}
-                    className="max-h-[60vh] md:max-h-[70vh] w-full object-contain"
-                  />
-                  <div className="bg-ink-900 p-6 text-white">
-                    <span className="text-[10px] font-extrabold uppercase tracking-widest text-gold-400">
-                      {effectiveGallery[activeImageIndex].category} · {effectiveGallery[activeImageIndex].year}
-                    </span>
-                    <h3 className="font-heading text-lg font-bold text-white mt-1">
-                      {effectiveGallery[activeImageIndex].title}
-                    </h3>
-                    <p className="text-xs text-white/60 mt-2 leading-relaxed">
-                      {effectiveGallery[activeImageIndex].description}
-                    </p>
-                  </div>
-                </motion.div>
-
-                <button
-                  onClick={handleNextImage}
-                  className="absolute right-[-20px] md:right-[-60px] flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors z-20"
-                >
-                  <FiChevronRight size={24} />
-                </button>
-              </div>
-
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 };

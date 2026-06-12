@@ -71,10 +71,10 @@ export const AdminDashboardPage = () => {
 
   const quickLinks = [
     { label: 'Home Profile', tab: 'profile', description: 'Edit biography, contact details, and social links.' },
-    { label: 'Research Projects', tab: 'research', description: 'Add projects, images, files, and status updates.' },
+    { label: 'Research Projects', tab: 'research', description: 'Add projects and status updates.' },
     { label: 'Publications CMS', tab: 'publications', description: 'Manage papers, DOI links, and citation records.' },
     { label: 'Teaching Records', tab: 'teaching', description: 'Maintain course lists, syllabus details, and lecture notes.' },
-    { label: 'Media Gallery', tab: 'gallery', description: 'Upload event photos appearing on your public gallery.' },
+    { label: 'Media Gallery', tab: 'gallery', description: 'Manage gallery albums, cover images, and Google Drive folders.' },
     { label: 'Inbound Messages', tab: 'messages', description: 'Review submissions received from your public contact form.' },
     { label: 'Site Settings', tab: 'settings', description: 'Update SEO meta tags, maps, and Google Analytics hooks.' },
   ];

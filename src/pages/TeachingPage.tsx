@@ -28,7 +28,7 @@ export const TeachingPage = () => {
     <PageShell className="space-y-8 py-10">
       <SectionHeading eyebrow="Teaching" title="Teaching Profile" description="Course history, timelines, and subject stats powered by Firestore." />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 grid-cols-3">
         {[
           { label: 'Courses', value: totalCourses },
           { label: 'Semesters', value: semesters },

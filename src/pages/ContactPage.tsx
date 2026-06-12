@@ -8,6 +8,7 @@ import type { Profile, Settings } from '../types/content';
 import { PageShell } from '../components/common/PageShell';
 import { SectionHeading } from '../components/common/SectionHeading';
 import { LoadingState } from '../components/common/LoadingState';
+import { getEmbedMapUrl } from '../utils/format';
 
 type ContactForm = {
   name: string;
@@ -80,7 +81,7 @@ export const ContactPage = () => {
           </div>
 
           {effectiveProfile?.mapUrl ? (
-            <iframe title="Office map" src={effectiveProfile.mapUrl} className="mt-8 h-72 w-full rounded-[1.4rem] border-0" loading="lazy" />
+            <iframe title="Office map" src={getEmbedMapUrl(effectiveProfile.mapUrl, `${effectiveProfile.office || ''}, ${effectiveProfile.institution || ''}`)} className="mt-8 h-72 w-full rounded-[1.4rem] border-0" loading="lazy" />
           ) : null}
         </motion.div>
 
